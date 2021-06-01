@@ -5,7 +5,7 @@ from datetime import datetime
 
 DEFAULT_ARGS = {
     "owner": "airflow",
-    "start_date": datetime(2021, 1, 25),
+    "start_date": datetime(2021, 5, 31),
     "retries": 1,
     "email_on_failure": False,
     "email_on_retry": False,
@@ -19,12 +19,21 @@ with DAG(
         max_active_runs=1,
         tags=['data-flow'],
 ) as dag1:
-    files = ['customer', 'supplier', 'nation', 'region', 'orders', 'lineitem', 'part', 'partsupp']
-    for file in files:
-        tbl = DataTransferPostgres(
-            config={'table': f'public.{file}'},
-            query=f'select * from {file}',
-            task_id=f'{file}',
-            source_pg_conn_str="host='db2' port=5432 dbname='tpch' user='admin' password='postgres'",
-            pg_conn_str="host='db' port=5432 dbname='my_database2' user='postgres' password='postgres'",
-        )
+    # ['customer', 'supplier', 'nation', 'region', 'orders', 'lineitem', 'part', 'partsupp']
+
+    t1 = DataTransferPostgres(
+        config={'table': 'public.customers'},
+        query='select * from customers',
+        task_id='customers',
+        source_pg_conn_str="host='db2' port=5432 dbname='my_database_source' user='root' password='postgres'",
+        pg_conn_str="host='db' port=5432 dbname='my_database_target' user='root' password='postgres'",
+    )
+    t2 = DataTransferPostgres(
+        config={'table': 'public.supplier'},
+        query='select * from supplier',
+        task_id='supplier',
+        source_pg_conn_str="host='db2' port=5432 dbname='my_database_source' user='root' password='postgres'",
+        pg_conn_str="host='db' port=5432 dbname='my_database_target' user='root' password='postgres'",
+    )
+
+    t1 >> t2
