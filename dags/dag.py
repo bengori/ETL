@@ -75,4 +75,10 @@ with DAG(
         source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
         pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
     )
-    t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8
+    t1 >> t2
+    t2 >> t3
+    t3 >> t4
+    t4 >> t5
+    t5 >> t6
+    t6 >> t7
+    t7 >> t8
