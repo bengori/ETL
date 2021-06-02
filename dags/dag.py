@@ -19,21 +19,60 @@ with DAG(
         max_active_runs=1,
         tags=['data-flow'],
 ) as dag1:
-    # ['customer', 'supplier', 'nation', 'region', 'orders', 'lineitem', 'part', 'partsupp']
-
     t1 = DataTransferPostgres(
-        config={'table': 'public.customers'},
-        query='select * from customers',
+        config={'table': 'public.customer'},
+        query='select * from customer',
         task_id='customers',
-        source_pg_conn_str="host='db2' port=5432 dbname='my_database_source' user='root' password='postgres'",
-        pg_conn_str="host='db' port=5432 dbname='my_database_target' user='root' password='postgres'",
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
     )
     t2 = DataTransferPostgres(
         config={'table': 'public.supplier'},
         query='select * from supplier',
         task_id='supplier',
-        source_pg_conn_str="host='db2' port=5432 dbname='my_database_source' user='root' password='postgres'",
-        pg_conn_str="host='db' port=5432 dbname='my_database_target' user='root' password='postgres'",
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
     )
-
-    t1 >> t2
+    t3 = DataTransferPostgres(
+        config={'table': 'public.lineitem'},
+        query='select * from lineitem',
+        task_id='lineitem',
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
+    )
+    t4 = DataTransferPostgres(
+        config={'table': 'public.nation'},
+        query='select * from nation',
+        task_id='nation',
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
+    )
+    t5 = DataTransferPostgres(
+        config={'table': 'public.orders'},
+        query='select * from orders',
+        task_id='orders',
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
+    )
+    t6 = DataTransferPostgres(
+        config={'table': 'public.part'},
+        query='select * from part',
+        task_id='part',
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
+    )
+    t7 = DataTransferPostgres(
+        config={'table': 'public.partsupp'},
+        query='select * from partsupp',
+        task_id='partsupp',
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
+    )
+    t8 = DataTransferPostgres(
+        config={'table': 'public.region'},
+        query='select * from region',
+        task_id='region',
+        source_pg_conn_str="host='db' port=5432 dbname='tpch' user='root' password='postgres'",
+        pg_conn_str="host='db2' port=5432 dbname='db_target' user='root' password='postgres'",
+    )
+    t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8
