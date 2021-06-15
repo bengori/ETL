@@ -12,19 +12,19 @@ DEFAULT_ARGS = {
 }
 
 with DAG(
-        dag_id = "pg-data-flow1",
-        default_args = DEFAULT_ARGS,
-        schedule_interval = "@daily",
-        max_active_runs = 1,
-        tags = ['data-flow1'],
+        dag_id="pg-data-flow1",
+        default_args=DEFAULT_ARGS,
+        schedule_interval="@daily",
+        max_active_runs=1,
+        tags=['data-flow1'],
 ) as dag1:
     t1 = DataTransferPostgres(
-        config = {'table': 'public.customer'},
-        query = 'select * from customer',
-        task_id = 'customer',
-        source_pg_conn_str = "host= 'db' port = 5432 dbname = 'tpch_source' user = 'root' password = 'postgres'",
-        pg_conn_str = "host = 'db2' port = 5432 dbname = 'target' user = 'root' password = 'postgres'",
-        pg_meta_conn_str = "host = 'db2' port = 5432 dbname= 'target' user = 'root' password = 'postgres'", # modify
+        config={'table': 'public.customer', 'jobid_colname': 'launch_id'},
+        query='select *, {job_id} as {jobid_colname} from customer',
+        task_id='customer',
+        source_pg_conn_str="host= 'db' port = 5432 dbname = 'tpch_source' user = 'root' password = 'postgres'",
+        pg_conn_str="host = 'db2' port = 5432 dbname = 'target' user = 'root' password = 'postgres'",
+        pg_meta_conn_str="host = 'db2' port = 5432 dbname= 'target' user = 'root' password = 'postgres'",  # modify
     )
 
     """

@@ -22,7 +22,7 @@ with DAG(
 ) as dag:
     sensor1 = ExternalTaskSensor(
         external_task_id='customer',
-        external_dag_id='pg-data-flow',
+        external_dag_id='pg-data-flow1',
         task_id='customer',
         check_existence=True,
         allowed_states=[State.SUCCESS],

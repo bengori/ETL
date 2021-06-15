@@ -5,7 +5,9 @@ import logging
 
 class DataETLStatisticOperator(DataFlowBaseOperator):
     def __init__(self, config, pg_meta_conn_str, date_check=False, *args, **kwargs):
-        super().__init__(config=config, pg_meta_conn_str=pg_meta_conn_str, *args, **kwargs)
+        super(DataETLStatisticOperator, self).__init__(config=config, pg_meta_conn_str=pg_meta_conn_str,
+                                                       *args,
+                                                       **kwargs)
         self.config = config
         self.pg_meta_conn_str = pg_meta_conn_str
         self.date_check = date_check
@@ -39,13 +41,11 @@ class DataETLStatisticOperator(DataFlowBaseOperator):
                     **self.config
                 )
             )
-            results = cursor.fetchall()
-            for result in results:
-                column = result[0]
-                self.config.update(
-                    column=column
-                )
+            result = cursor.fetchall()
+            columns = [row for row, in result]
+            self.config.update(columns=columns)
 
+            for column in self.config['columns']:
                 cursor.execute(
                     """
                     SELECT count(*)
@@ -59,7 +59,7 @@ class DataETLStatisticOperator(DataFlowBaseOperator):
 
                 cursor.execute(
                     """
-                    SELECT count(column)
+                    SELECT count({column})
                     FROM {table};
                     """.format(
                         **self.config
