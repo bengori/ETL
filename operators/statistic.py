@@ -45,7 +45,19 @@ class DataETLStatisticOperator(DataFlowBaseOperator):
             columns = [row for row, in result]
             self.config.update(columns=columns)
 
-            for column in self.config['columns']:
+        for column in columns:
+            self.config.update(column=column)
+            with psycopg2.connect(self.pg_meta_conn_str) as conn, conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT count({column})
+                    FROM {table};
+                    """.format(
+                        **self.config
+                    )
+                )
+                cnt_not_null = int(cursor.fetchone()[0])
+
                 cursor.execute(
                     """
                     SELECT count(*)
@@ -57,15 +69,6 @@ class DataETLStatisticOperator(DataFlowBaseOperator):
                 cnt_all = int(cursor.fetchone()[0])
                 self.config.update(cnt_all=cnt_all)
 
-                cursor.execute(
-                    """
-                    SELECT count({column})
-                    FROM {table};
-                    """.format(
-                        **self.config
-                    )
-                )
-                cnt_not_null = int(cursor.fetchone()[0])
                 cnt_nulls = cnt_all - cnt_not_null
                 self.config.update(
                     cnt_nulls=cnt_nulls
