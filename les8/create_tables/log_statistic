@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS LOG, STATISTIC;
+
+CREATE TABLE LOG ( source_launch_id INTEGER NOT NULL,
+					target_schema text,
+					target_table text,
+					target_launch_id INTEGER NOT NULL,
+					processed_dttm timestamp default now(),
+					row_count INTEGER,
+					duration interval,
+					load_date date);
+
+create table statistic (table_name text,
+						column_name text,
+						cnt_nulls int,
+						cnt_all int,
+						load_date date);
