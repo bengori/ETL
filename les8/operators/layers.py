@@ -1,9 +1,8 @@
-import logging
 import time
 import datetime
 import psycopg2
 from airflow.utils.decorators import apply_defaults
-from les8.operators.utils import DataFlowBaseOperator
+from operators.utils import DataFlowBaseOperator
 
 
 class SalOperator(DataFlowBaseOperator): #sae -> sal
@@ -161,7 +160,7 @@ class DdsLOperator(DataFlowBaseOperator): #sal -> dds for links
         self.config = dict(
             self.defaults,
             target_table='l_{hubs}'.format(hubs='_'.join(f'{i}' for i in config['hub_bk'].keys())),  # modify
-            hub_ids=', '.join(f'h_{i}_id' for i in config['hub_bk'].keys()),
+            hub_ids=', '.join(f'{i}_id' for i in config['hub_bk'].keys()),
             **config
         )
         self.pg_conn_str = pg_conn_str
@@ -227,7 +226,7 @@ class DdsSOperator(DataFlowBaseOperator): #sal -> dds for sattelites of hubs
         )
         self.config = dict(
             self.defaults,
-            target_table='s_{hub_name}'.format(**config),  # need modify?
+            target_table='s_{hub_name}'.format(**config),
             **config
         )
         self.pg_conn_str = pg_conn_str
@@ -251,15 +250,15 @@ class DdsSOperator(DataFlowBaseOperator): #sal -> dds for sattelites of hubs
                 insert_sql = '''
                 with x as (
                     select distinct
-                           h_{hub_name}_id
+                           {hub_name}_id
                          , {satellite_columns}
                       from {source_schema}.{source_table} s
-                      join dds.h_{hub_name} h
+                      join dds.{hub_name} h
                       on s.{bk_column} = h.{hub_name}_bk
                       where s.launch_id = {launch_id}
                 )
                 insert into {target_schema}.{target_table} (h_{hub_name}_id, {satellite_columns}, launch_id)
-                select h_{hub_name}_id
+                select {hub_name}_id
                      , {satellite_columns}
                      , {job_id}
                   from x;

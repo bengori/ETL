@@ -86,7 +86,7 @@ class DataFlowBaseOperator(BaseOperator):
                 from log
                 where target_launch_id not in (
                 select source_launch_id
-                    from etl.log
+                    from log
                     where target_table = '{target_table}'
                     and target_schema = '{target_schema}'
                     and source_launch_id is not null
@@ -98,5 +98,5 @@ class DataFlowBaseOperator(BaseOperator):
             logging.info('Executing metadata query: {}'.format(query.format(**config)))
             cursor.execute(query.format(**config))
             ids = cursor.fetchone()[0]
-            logging.info('Launch_ids: {}'.format(ids))  # need modify?
-        return tuple(ids.strip('{}').split(',')) if ids else ()  # need modify?
+            logging.info('Launch_ids: {}'.format(ids))
+        return tuple(ids) if ids else ()  # modify

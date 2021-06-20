@@ -1,6 +1,6 @@
 from airflow import DAG
-from les8.operators.postgres import DataTransferPostgres
-from les8.operators.layers import SalOperator, DdsSOperator, DdsHOperator, DdsLOperator, DdsLSOperator
+from operators.postgres import DataTransferPostgres
+from operators.layers import SalOperator, DdsSOperator, DdsHOperator, DdsLOperator, DdsLSOperator
 from datetime import datetime
 import yaml
 import os
@@ -12,17 +12,14 @@ with open(os.path.join(os.path.dirname(__file__), 'schema.yaml'), encoding='utf-
 
 DEFAULT_ARGS = {
     "owner": "airflow",
-    "start_date": datetime(2021, 6, 14),
+    "start_date": datetime(2021, 6, 19),
     "retries": 1,
     "email_on_failure": False,
     "email_on_retry": False,
     "depends_on_past": True,
 }
 
-SAE_QUERY = 'select *, {job_id} AS launch_id from {table}'
-SOURCE_PG_CONN_STR = "host='db' port=5432 dbname='my_postgres_source' user='root' password='postgres'"
-PG_CON_STR = "host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'"
-PG_META_CONN_STR = "host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'"
+SAE_QUERY='select *, {job_id} AS launch_id from {table}'
 
 with DAG(
         dag_id="pg-data-vault",
@@ -36,11 +33,11 @@ with DAG(
             config=dict(
                 table='sae.{table}'.format(table=table)
             ),
-            query=SAE_QUERY.format(table=table),
+            query=SAE_QUERY,
             task_id='sae_{table}'.format(table=table),
-            source_pg_conn_str=SOURCE_PG_CONN_STR,
-            pg_conn_str=PG_CON_STR,
-            pg_meta_conn_str=PG_META_CONN_STR,
+            source_pg_conn_str="host='db' port=5432 dbname='my_postgres_source' user='root' password='postgres'",
+            pg_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
+            pg_meta_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
         )
         for table in YAML_DATA['sources']['tables'].keys()
     }
@@ -52,8 +49,8 @@ with DAG(
                 source_table=table,
             ),
             task_id='sal_{table}'.format(table=table),
-            pg_conn_str=PG_CON_STR,
-            pg_meta_conn_str=PG_META_CONN_STR,
+            pg_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
+            pg_meta_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
         )
         for table in YAML_DATA['sources']['tables'].keys()
     }
@@ -70,8 +67,8 @@ with DAG(
                     'source_table': table,
                     'bk_column': bk_column
                 },
-                pg_conn_str=PG_CON_STR,
-                pg_meta_conn_str=PG_META_CONN_STR,
+                pg_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
+                pg_meta_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
             )
             for table, cols in YAML_DATA['sources']['tables'].items()
             for col in cols['columns']
@@ -91,8 +88,8 @@ with DAG(
         hub_name: {
             table_name: DdsSOperator(
                 task_id='dds.s_{hub_name}'.format(hub_name=hub_name),
-                pg_conn_str=PG_CON_STR,
-                pg_meta_conn_str=PG_META_CONN_STR,
+                pg_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
+                pg_meta_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
                 config=dict(
                     hub_name=hub_name,
                     bk_column=bk_column,
@@ -106,7 +103,7 @@ with DAG(
             if (inf.get('bk_for') == hub_name) and (inf.get('owner') is True)
         }
         for hub_name, info in YAML_DATA['groups']['hubs'].items()
-        for satellite_columns in info['satellite']['columns'].items()
+        for _, satellite_columns in info['satellite'].items()
     }
 
     for hub, info in hub_satellites.items():
@@ -156,8 +153,8 @@ with DAG(
                     hub_bk=for_links[link_name]['hub_bk_config'],
                     source_table=for_links[link_name]['source_table'],
                 ),
-                pg_conn_str="host='db2' port=5432 dbname='target_database' user='root' password='postgres'",
-                pg_meta_conn_str="host='metadb' port=5432 dbname='meta_database' user='root' password='postgres'",
+                pg_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
+                pg_meta_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
             )
         }
         for link_name, link_info in YAML_DATA['groups']['links'].items()
@@ -184,8 +181,8 @@ with DAG(
                              if inf['satellite_for'].get('link') == link_name
                              ]
                 ),
-                pg_conn_str="host='db2' port=5432 dbname='target_database' user='root' password='postgres'",
-                pg_meta_conn_str="host='metadb' port=5432 dbname='meta_database' user='root' password='postgres'",
+                pg_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
+                pg_meta_conn_str="host='db2' port=5432 dbname='my_postgres_target' user='root' password='postgres'",
             )
         }
         for link_name, link_info in YAML_DATA['groups']['links'].items()

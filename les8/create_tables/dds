@@ -1,6 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS dds;
-drop table if exists dds.h_part, dds.h_supplier, dds.h_partsupp, dds.h_lineitem, dds.h_orders, dds.h_customer, dds.h_nation, dds.h_region, dds.l_customer_nation, dds.l_nation_region, dds.l_orders_customer, dds.l_lineitem_orders, dds.l_lineitem_part, dds.l_lineitem_supplier, dds.l_partsupp_part, dds.l_partsupp_supplier, dds.s_part, dds.s_supplier, dds.s_partsupp, dds.s_lineitem, dds.s_orders, dds.s_customer, dds.s_nation, dds.s_region;
-
+drop table if exists dds.h_part, dds.h_supplier, dds.h_orders, dds.h_customer, dds.h_nation, dds.h_region, dds.l_customer_nation, dds.l_nation_region, dds.l_orders_customer, dds.l_supplier_nation, dds.l_part_supplier_orders, dds.l_part_supplier, dds.s_supplier, dds.s_part, dds.s_customer, dds.s_nation, dds.s_region, dds.l_s_part_supplier, dds.l_s_part_suppliers_orders, dds.l_s_orders_customer;
 
 create table dds.h_part (
     part_id SERIAL PRIMARY KEY,

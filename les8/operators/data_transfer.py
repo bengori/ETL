@@ -3,7 +3,7 @@ import time
 import datetime
 import psycopg2
 from airflow.utils.decorators import apply_defaults
-from les8.operators.utils import DataFlowBaseOperator
+from operators.utils import DataFlowBaseOperator
 
 
 class DataTransfer(DataFlowBaseOperator):

@@ -1,4 +1,4 @@
-from les8.operators.data_transfer import DataTransfer
+from operators.data_transfer import DataTransfer
 import csv
 import psycopg2
 
