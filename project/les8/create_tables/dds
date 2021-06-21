@@ -1,5 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS dds;
-drop table if exists dds.h_part, dds.h_supplier, dds.h_orders, dds.h_customer, dds.h_nation, dds.h_region, dds.l_customer_nation, dds.l_nation_region, dds.l_orders_customer, dds.l_supplier_nation, dds.l_part_supplier_orders, dds.l_part_supplier, dds.s_supplier, dds.s_part, dds.s_customer, dds.s_nation, dds.s_region, dds.l_s_part_supplier, dds.l_s_part_suppliers_orders, dds.l_s_orders_customer;
+drop table if exists dds.h_part, dds.h_supplier, dds.h_orders, dds.h_customer, dds.h_nation, dds.h_region, dds.l_customer_nation, dds.l_nation_region, dds.l_orders_customer, dds.l_supplier_nation, dds.l_part_supplier_orders, dds.l_part_supplier, dds.s_supplier, dds.s_part, dds.s_customer, dds.s_nation, dds.s_region, dds.l_s_part_supplier, dds.l_s_part_supplier_orders, dds.l_s_orders_customer;
 
 create table dds.h_part (
     part_id SERIAL PRIMARY KEY,
@@ -50,6 +50,7 @@ create table dds.h_region (
 
 
 create table dds.l_customer_nation (
+    customer_nation_id SERIAL PRIMARY KEY,
     customer_id int,
     nation_id int,
     launch_id int,
@@ -58,6 +59,7 @@ create table dds.l_customer_nation (
 
 
 create table dds.l_nation_region (
+    nation_region_id SERIAL PRIMARY KEY,
     nation_id int,
     region_id int,
     launch_id int,
@@ -66,6 +68,7 @@ create table dds.l_nation_region (
 
 
 create table dds.l_orders_customer (
+    orders_customer_id SERIAL PRIMARY KEY,
     orders_id int,
     customer_id int,
     launch_id int,
@@ -74,6 +77,7 @@ create table dds.l_orders_customer (
 
 
 create table dds.l_supplier_nation (
+    supplier_nation_id SERIAL PRIMARY KEY,
     supplier_id int,
     nation_id int,
     launch_id int,
@@ -82,6 +86,7 @@ create table dds.l_supplier_nation (
 
 
 create table dds.l_part_supplier_orders (
+    part_supplier_orders_id SERIAL PRIMARY KEY,
     part_id int,
     supplier_id int,
     orders_id int,
@@ -91,6 +96,7 @@ create table dds.l_part_supplier_orders (
 
 
 create table dds.l_part_supplier (
+    part_supplier_id SERIAL PRIMARY KEY,
     part_id int,
     supplier_id int,
     launch_id int,
@@ -139,15 +145,15 @@ create table dds.s_region (
 
 
 create table dds.l_s_part_supplier (
-    part_suppllier_id int,
+    part_supplier_id int,
     availqty int, supplycost numeric, comment text,
     launch_id int,
     effective_dttm timestamp default now()
 );
 
 
-create table dds.l_s_part_suppliers_orders (
-    lineitem_id int,
+create table dds.l_s_part_supplier_orders (
+    part_supplier_orders_id int,
     linenumber int, quantity numeric, extendedprice numeric, discount numeric, tax numeric, returnflag text, linestatus text, shipdate date, commitdate date, receiptdate date, shipinstruct text, shipmode text, comment text,
     launch_id int,
     effective_dttm timestamp default now()

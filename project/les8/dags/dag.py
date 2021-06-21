@@ -12,7 +12,7 @@ with open(os.path.join(os.path.dirname(__file__), 'schema.yaml'), encoding='utf-
 
 DEFAULT_ARGS = {
     "owner": "airflow",
-    "start_date": datetime(2021, 6, 19),
+    "start_date": datetime(2021, 6, 14),
     "retries": 1,
     "email_on_failure": False,
     "email_on_retry": False,

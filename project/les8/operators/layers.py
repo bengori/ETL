@@ -253,11 +253,11 @@ class DdsSOperator(DataFlowBaseOperator): #sal -> dds for sattelites of hubs
                            {hub_name}_id
                          , {satellite_columns}
                       from {source_schema}.{source_table} s
-                      join dds.{hub_name} h
+                      join dds.h_{hub_name} h
                       on s.{bk_column} = h.{hub_name}_bk
                       where s.launch_id = {launch_id}
                 )
-                insert into {target_schema}.{target_table} (h_{hub_name}_id, {satellite_columns}, launch_id)
+                insert into {target_schema}.{target_table} ({hub_name}_id, {satellite_columns}, launch_id)
                 select {hub_name}_id
                      , {satellite_columns}
                      , {job_id}
@@ -292,7 +292,7 @@ class DdsLSOperator(DataFlowBaseOperator):  # sal -> dds for satellites of links
         self.config = dict(
             self.defaults,
             target_table='l_s_{hubs}'.format(hubs='_'.join(f'{i}' for i in config['hub_bk'].keys())),
-            hub_ids=', '.join(f'h_{i}_id' for i in config['hub_bk'].keys()),
+            hub_ids=', '.join(f'{i}_id' for i in config['hub_bk'].keys()),
             link_name='_'.join(f'{i}' for i in config['hub_bk'].keys()),
             cols=', '.join(f'{i}' for i in config['columns']),
             **config
@@ -314,7 +314,7 @@ class DdsLSOperator(DataFlowBaseOperator):  # sal -> dds for satellites of links
                 joins_to_source += join.format(i=i, hub_name=hub_name, bk_column=bk_column)
 
             ons_to_x = ''''''
-            on = 'x.h_{hub_name}_id = l.h_{hub_name}_id AND \n'
+            on = 'x.{hub_name}_id = l.{hub_name}_id AND \n'
             for hub_name, _ in self.config['hub_bk'].items():
                 ons_to_x += on.format(hub_name=hub_name)
             ons_to_x = ons_to_x[:-5]
@@ -333,8 +333,8 @@ class DdsLSOperator(DataFlowBaseOperator):  # sal -> dds for satellites of links
                     {joins_to_source}
                     where s.launch_id = {launch_id}
                 )
-                insert into {target_schema}.{target_table} (l_{link_name}_id, {cols}, launch_id)
-                select l_{link_name}_id
+                insert into {target_schema}.{target_table} ({link_name}_id, {cols}, launch_id)
+                select {link_name}_id
                      , {cols}
                      , {job_id}
                   from x

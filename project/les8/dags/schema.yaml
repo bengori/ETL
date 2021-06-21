@@ -26,18 +26,17 @@ groups:
         columns:
           name:
             dtype: {}
-          addres:
+          address:
             dtype: {}
           phone:
             dtype: {}
           acctbal:
             dtype: {}
-          commen t:
+          comment:
             dtype: {}
     orders:
       bk_dtype: int
-      satellite:
-        columns: {}
+      satellite: {}
     customer:
       bk_dtype: int
       satellite:
